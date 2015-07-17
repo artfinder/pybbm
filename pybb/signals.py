@@ -1,5 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, post_delete, pre_save
@@ -83,4 +84,4 @@ def setup():
     post_save.connect(post_saved, sender=Post)
     post_delete.connect(post_deleted, sender=Post)
     if defaults.PYBB_AUTO_USER_PERMISSIONS:
-        post_save.connect(user_saved, sender=compat.get_user_model())
+        post_save.connect(user_saved, sender=settings.AUTH_USER_MODEL)
