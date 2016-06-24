@@ -288,10 +288,10 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
             # Check, if there are any unread topics in forum
             topic_readed = topic.forum.topics.filter(topicreadtracker__user=user,
                                                      topicreadtracker__time_stamp__gte=F('updated')
-                                                     ).values_list('id').order_by()
+                                                     ).values_list('id', flat=True).order_by()
             forum_readed = topic.forum.topics.filter(forum__forumreadtracker__user=user,
                                                      forum__forumreadtracker__time_stamp__gte=F('updated')
-                                                     ).values_list('id').order_by()
+                                                     ).values_list('id', flat=True).order_by()
 
             not_readed = topic.forum.topics.exclude(id__in=list(forum_readed) + list(topic_readed))
             if not not_readed.exists():
