@@ -286,13 +286,14 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
                 topic_mark.save()
 
             # Check, if there are any unread topics in forum
-            readed = topic.forum.topics.filter((Q(topicreadtracker__user=user,
-                                                  topicreadtracker__time_stamp__gte=F('updated'))) |
-                                                Q(forum__forumreadtracker__user=user,
-                                                  forum__forumreadtracker__time_stamp__gte=F('updated')))\
-                                       .only('id').order_by()
+            topic_readed = topic.forum.topics.filter(topicreadtracker__user=user,
+                                                     topicreadtracker__time_stamp__gte=F('updated')
+                                                     ).values_list('id').order_by()
+            forum_readed = topic.forum.topics.filter(forum__forumreadtracker__user=user,
+                                                     forum__forumreadtracker__time_stamp__gte=F('updated')
+                                                     ).values_list('id').order_by()
 
-            not_readed = topic.forum.topics.exclude(id__in=readed)
+            not_readed = topic.forum.topics.exclude(id__in=list(forum_readed) + list(topic_readed))
             if not not_readed.exists():
                 # Clear all topic marks for this forum, mark forum as readed
                 TopicReadTracker.objects.filter(user=user, topic__forum=topic.forum).delete()
